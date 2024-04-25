@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <title>Remote Mouse Controller</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: black;
+      overscroll-behavior-x: none;
+    }
+  </style>
+</head>
+
+<body id="root">
+  <!-- <script src="/socket.io/socket.io.js"> -->
+  <!-- </script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+
+  <script>
+    let socket = io();
+    let clientX, clientY;
+
+    const root = document.getElementById('root');
+    root.addEventListener('click', (e) => {
+      socket.emit('app:click')
+    })
+    root.addEventListener('touchstart', async (e) => {
+      clientX = e.touches['0'].pageX;
+      clientY = e.touches['0'].pageY;
+    })
+    root.addEventListener('touchmove', async (e) => {
+      const newX = e.touches['0'].pageX
+      const newY = e.touches['0'].pageY
+
+      const xDiff = (clientX - newX) / 1.2;
+      const yDiff = (clientY - newY) / 1.2;
+
+      clientX = newX
+      clientY = newY
+
+      socket.emit('app:touchmove', [-Math.ceil(xDiff), -Math.ceil(yDiff)])
+    })
+  </script>
+</body>
+
+</html>
